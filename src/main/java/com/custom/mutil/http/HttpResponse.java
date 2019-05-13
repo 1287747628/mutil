@@ -6,6 +6,9 @@ import java.io.UnsupportedEncodingException;
 
 public class HttpResponse {
 
+    public static final int STATUS_500 = 500;//请求出错
+    public static final int STATUS_200 = 200;//请求完成
+
     /**
      * 返回中的Header信息
      */
@@ -25,6 +28,14 @@ public class HttpResponse {
      * http状态码
      */
     private Integer statusCode;
+
+    public HttpResponse() {
+
+    }
+
+    public HttpResponse(int statusCode) {
+        this.statusCode = statusCode;
+    }
 
     public Header[] getResponseHeaders() {
         return responseHeaders;
