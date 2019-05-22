@@ -8,9 +8,9 @@ import java.util.Date;
 
 public class DateUtil {
 
-    private static final DateTimeFormatter yyyy_MM_dd_HH_mm_ss = DateTimeFormatter.ofPattern("yyyy-MM-dd HH:mm:ss");
-    private static final DateTimeFormatter yyyyMMddHHmmss = DateTimeFormatter.ofPattern("yyyyMMddHHmmss");
-    private static final DateTimeFormatter yyyyMMdd = DateTimeFormatter.ofPattern("yyyyMMdd");
+    public static final String yyyy_MM_dd_HH_mm_ss = "yyyy-MM-dd HH:mm:ss";
+    public static final String yyyyMMddHHmmss = "yyyyMMddHHmmss";
+    public static final String yyyyMMdd = "yyyyMMdd";
 
     public static String format(LocalDateTime dateTime, String pattern) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern);
@@ -18,7 +18,7 @@ public class DateUtil {
     }
 
     public static String format(LocalDateTime dateTime) {
-        return yyyy_MM_dd_HH_mm_ss.format(dateTime);
+        return format(dateTime, yyyy_MM_dd_HH_mm_ss);
     }
 
     public static String format(Date date, String pattern) {
@@ -28,25 +28,7 @@ public class DateUtil {
 
     public static String format(Date date) {
         LocalDateTime localDateTime = date4LocalDateTime(date);
-        return yyyy_MM_dd_HH_mm_ss.format(localDateTime);
-    }
-
-    public static String format_yyyyMMddHHmmss(LocalDateTime dateTime) {
-        return yyyyMMddHHmmss.format(dateTime);
-    }
-
-    public static String format_yyyyMMddHHmmss(Date date) {
-        LocalDateTime localDateTime = date4LocalDateTime(date);
-        return yyyyMMddHHmmss.format(localDateTime);
-    }
-
-    public static String format_yyyyMMdd(Date date) {
-        LocalDateTime localDateTime = date4LocalDateTime(date);
-        return yyyyMMdd.format(localDateTime);
-    }
-
-    public static String format_yyyyMMdd(LocalDateTime dateTime) {
-        return yyyyMMdd.format(dateTime);
+        return format(localDateTime, yyyy_MM_dd_HH_mm_ss);
     }
 
     public static LocalDateTime date4LocalDateTime(Date date) {
@@ -61,40 +43,21 @@ public class DateUtil {
         return Date.from(instant);
     }
 
+    public static LocalDateTime parse(String dateStr) {
+        return parse(dateStr, yyyy_MM_dd_HH_mm_ss);
+    }
+
     public static LocalDateTime parse(String dateStr, String pattern) {
         DateTimeFormatter dtf = DateTimeFormatter.ofPattern(pattern);
         return LocalDateTime.parse(dateStr, dtf);
     }
 
+    public static Date parseDate(String dateStr) {
+        return parseDate(dateStr,yyyy_MM_dd_HH_mm_ss);
+    }
+
     public static Date parseDate(String dateStr, String pattern) {
         LocalDateTime localDateTime = parse(dateStr, pattern);
-        return localDateTime4Date(localDateTime);
-    }
-
-    public static LocalDateTime parse(String dateStr) {
-        return LocalDateTime.parse(dateStr, yyyy_MM_dd_HH_mm_ss);
-    }
-
-    public static Date parseDate(String dateStr) {
-        LocalDateTime localDateTime = parse(dateStr);
-        return localDateTime4Date(localDateTime);
-    }
-
-    public static LocalDateTime parse_yyyyMMddHHmmss(String dateStr) {
-        return LocalDateTime.parse(dateStr, yyyyMMddHHmmss);
-    }
-
-    public static Date parseDate_yyyyMMddHHmmss(String dateStr) {
-        LocalDateTime localDateTime = parse_yyyyMMddHHmmss(dateStr);
-        return localDateTime4Date(localDateTime);
-    }
-
-    public static LocalDateTime parse_yyyyMMdd(String dateStr) {
-        return LocalDateTime.parse(dateStr, yyyyMMdd);
-    }
-
-    public static Date parseDate_yyyyMMdd(String dateStr) {
-        LocalDateTime localDateTime = parse_yyyyMMdd(dateStr);
         return localDateTime4Date(localDateTime);
     }
 
