@@ -98,7 +98,7 @@ public class FileUtil {
     private static List<String> getAllPath(String directory) throws Exception {
         File path = new File(directory);
         if (!path.exists()) {
-            throw new Exception(directory + " does not exists.");
+            throw new RuntimeException(directory + " does not exists.");
         }
         //
         List<String> paths = new ArrayList<>();
