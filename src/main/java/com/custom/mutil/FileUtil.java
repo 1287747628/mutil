@@ -1,13 +1,20 @@
 package com.custom.mutil;
 
+import javax.net.ssl.*;
 import java.io.*;
+import java.net.URL;
+import java.net.URLConnection;
 import java.nio.file.DirectoryStream;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.nio.file.Paths;
+import java.security.cert.CertificateException;
+import java.security.cert.X509Certificate;
 import java.util.*;
 
 public class FileUtil {
+
+    private static final int CONNECT_TIMEOUT = 10000;
 
     /**
      * 读取properties文件
@@ -132,10 +139,90 @@ public class FileUtil {
         }
     }
 
+    /**
+     * 通过http方式下载文件
+     *
+     * @param fileUrl   文件url
+     * @param localFile 下载后的本地存储文件
+     * @return true false
+     */
+    public static boolean downloadFile(String fileUrl, File localFile) throws Exception {
+        if (localFile == null || StringUtil.isEmpty(fileUrl)) {
+            return false;
+        }
+        URLConnection urlConnection = new URL(fileUrl).openConnection();
+        boolean useHttps = fileUrl.startsWith("https");
+        if (useHttps) {
+            HttpsURLConnection httpsURLConnection = (HttpsURLConnection) urlConnection;
+            trustAllHosts(httpsURLConnection);
+            httpsURLConnection.setHostnameVerifier(DO_NOT_VERIFY);
+        }
+        urlConnection.setConnectTimeout(CONNECT_TIMEOUT);
+        urlConnection.setReadTimeout(CONNECT_TIMEOUT);
+        //
+        File localFileDir = new File(localFile.getParent());
+        if (!localFileDir.exists()) {
+            localFileDir.mkdirs();
+        }
+        //
+        try (InputStream ins = urlConnection.getInputStream(); FileOutputStream fos = new FileOutputStream(localFile)) {
+            byte[] buffer = new byte[1024];
+            int len;
+            while ((len = ins.read(buffer)) > -1) {
+                fos.write(buffer, 0, len);
+            }
+        }
+        return true;
+    }
+
+    /**
+     * 信任所有
+     *
+     * @param connection url连接
+     * @return
+     */
+    private static void trustAllHosts(HttpsURLConnection connection) throws Exception {
+        SSLSocketFactory oldFactory = connection.getSSLSocketFactory();
+        SSLContext sc = SSLContext.getInstance("TLS");
+        sc.init(null, trustAllCerts, new java.security.SecureRandom());
+        SSLSocketFactory newFactory = sc.getSocketFactory();
+        connection.setSSLSocketFactory(newFactory);
+    }
+
+    /**
+     * 设置不验证主机
+     */
+    private static final HostnameVerifier DO_NOT_VERIFY = new HostnameVerifier() {
+        @Override
+        public boolean verify(String hostname, SSLSession session) {
+            return true;
+        }
+    };
+
+    /**
+     * 覆盖java默认的证书验证
+     */
+    private static final TrustManager[] trustAllCerts = new TrustManager[]{new X509TrustManager() {
+        @Override
+        public java.security.cert.X509Certificate[] getAcceptedIssuers() {
+            return new java.security.cert.X509Certificate[]{};
+        }
+
+        @Override
+        public void checkClientTrusted(X509Certificate[] chain, String authType)
+                throws CertificateException {
+        }
+
+        @Override
+        public void checkServerTrusted(X509Certificate[] chain, String authType)
+                throws CertificateException {
+        }
+    }};
+
 
     public static void main(String[] args) {
         try {
-            File file = new File("D:\\test.txt");
+            File file = new File("D:\\a\\b\\myd\\test.txt");
             //FileUtil.copyFile(file, new File(file.getAbsolutePath() + "_backup_" + DateUtil.format_yyyyMMddHHmmss(new Date())));
             System.out.println("path:" + file.getPath());
             System.out.println("absPath:" + file.getAbsolutePath());

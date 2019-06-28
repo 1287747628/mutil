@@ -1,10 +1,13 @@
 package com.custom.mutil;
 
+import org.apache.commons.lang3.time.DateFormatUtils;
+
 import java.time.Instant;
 import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 import java.util.Date;
+import java.util.Locale;
 
 public class DateUtil {
 
@@ -59,6 +62,10 @@ public class DateUtil {
     public static Date parseDate(String dateStr, String pattern) {
         LocalDateTime localDateTime = parse(dateStr, pattern);
         return localDateTime4Date(localDateTime);
+    }
+
+    public static String formatUTC(Date date, String pattern) {
+        return DateFormatUtils.formatUTC(date, pattern);
     }
 
     public static void main(String[] args) {
