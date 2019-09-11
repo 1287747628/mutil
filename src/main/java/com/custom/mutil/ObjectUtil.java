@@ -3,10 +3,12 @@ package com.custom.mutil;
 import com.alibaba.fastjson.JSON;
 import org.apache.commons.lang3.SerializationUtils;
 
+import java.beans.IntrospectionException;
+import java.beans.PropertyDescriptor;
 import java.io.Serializable;
+import java.lang.reflect.Field;
 import java.lang.reflect.Method;
-import java.util.HashMap;
-import java.util.Map;
+import java.util.*;
 
 /**
  * 操作对象工具类
@@ -46,6 +48,7 @@ public class ObjectUtil {
 
     /**
      * 浅克隆
+     *
      * @param source
      * @param targetCls
      * @param <T>
@@ -99,6 +102,30 @@ public class ObjectUtil {
             }
         }
         return targetBean;
+    }
+
+    public static Map<String, String> getObjectFields(Object obj) throws Exception {
+        Map<String, String> fields = new HashMap<>();
+        if (obj == null) {
+            return fields;
+        }
+        for (Class<?> cls = obj.getClass(); cls != Object.class; cls = cls.getSuperclass()) {
+            Field[] fds = cls.getDeclaredFields();
+            if (fds == null || fds.length == 0) {
+                continue;
+            }
+            for (Field fd : fds) {
+                PropertyDescriptor descriptor = new PropertyDescriptor(fd.getName(), cls);
+                Method m = descriptor.getReadMethod();
+                Object oValue = m.invoke(obj);
+                if (oValue == null) {
+                    fields.put(fd.getName(), "");
+                } else {
+                    fields.put(fd.getName(), String.valueOf(oValue));
+                }
+            }
+        }
+        return fields;
     }
 
 }
